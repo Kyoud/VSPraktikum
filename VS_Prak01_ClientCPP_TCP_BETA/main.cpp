@@ -1,4 +1,5 @@
 #include <iostream>
+#include <string>
 #include <string.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -51,12 +52,23 @@ int main()
 
     
     
+    
+    
+    memset(buffer, 0, BUFSIZE);
     // Alle 5 Anfragen in einem send() schicken
+    int length = 100;
+    
+    strncpy(buffer,"100", 3);
+    cout << "sendpackage: " << buffer <<endl; 
+    send(socket_client, buffer, sizeof(length), 0);
+    memset(buffer, 0, BUFSIZE);
     
     string sendingbuffer = "";
     for(int i=0; i < 5; ++i){
         sendingbuffer+= "time%";
+        
     } 
+
     
     const char *cstr = sendingbuffer.c_str();    
     strncpy(buffer, cstr, 50);
@@ -64,11 +76,13 @@ int main()
     
     string send_message;
     cout << "Nachricht jetzt senden?: ";
-    cin >> send_message;
+    //cin >> send_message;
     
     time_t now = time(NULL);  //Zeit beim Senden
     string timeStamp = ctime(&now);      
     replace(timeStamp.begin(), timeStamp.end(), '\n', ' '); 
+    
+    
     
     send(socket_client, buffer, BUFSIZE, 0); //Senden 5 mal time
     

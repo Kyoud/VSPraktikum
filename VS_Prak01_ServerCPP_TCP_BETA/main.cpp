@@ -19,7 +19,7 @@ using namespace std;
 
 int main()
 {
-    int socket_client, socket_server, result;
+    int socket_client, socket_server, result, length, recived;
     char buffer[BUFSIZE];
     char sendbuffer[BUFSIZE];
     socklen_t size;
@@ -68,6 +68,16 @@ int main()
     
     //char sendbuffer[BUFSIZE];
     //while(1){
+        result =recv(socket_server, buffer, sizeof(recived), 0);
+        if (result<0){
+            cout << "recive length faild";
+            return -1;
+        }
+        recived = atoi(buffer);
+        cout << "laenge: " << recived <<endl;
+        memset(buffer, 0, sizeof(recived));
+        
+        
         time_t now = time (NULL);   
         string timeStamp = ctime(&now);
         replace(timeStamp.begin(), timeStamp.end(), '\n', ' ');
@@ -82,10 +92,17 @@ int main()
         }
         cout << "[" << timeStamp.substr(11, 8) << "] Anfrage von " << inet_ntoa(server_addr.sin_addr) 
              << ", Port" << PORT << ". Empfangene Nachricht: " << buffer << endl;
-        
+        length=0;
         char *p = strtok(buffer, "%");
-        while(p != NULL){
-            if(memcmp(p, "time", sizeof(p))){
+        while(recived > length){
+           result = recv(socket_server, buffer, recived-length , 0);
+           if (result>0){
+               length =+ result;
+           }
+           cout <<"empfangen"<<endl;
+        }
+
+                if(memcmp(p, "time", sizeof(p))){
                 string antwort = "tood und verderben";
                 memset(sendbuffer, 0, BUFSIZE);
                 
@@ -99,14 +116,16 @@ int main()
                 
                 //cout << "sende uhrzeit..." << endl;
                 send(socket_server, sendbuffer, BUFSIZE, 0);
-            } 
             p = strtok(NULL, "%");
+
+
             
             string nextPackage;
-            cout << "send next package: ";
-            cin >> nextPackage;
+            cout << "send next package: " <<endl;
+            /*cin >> nextPackage;
             if(nextPackage == "e")
-                break;
+                break;*/
+            
         }
     //}
      
