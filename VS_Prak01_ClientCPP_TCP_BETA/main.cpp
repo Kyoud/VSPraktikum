@@ -57,17 +57,19 @@ int main()
     memset(buffer, 0, BUFSIZE);
     // Alle 5 Anfragen in einem send() schicken
     int length = 100;
-    
-    strncpy(buffer,"100", 3);
-    cout << "sendpackage: " << buffer <<endl; 
-    send(socket_client, buffer, sizeof(length), 0);
-    memset(buffer, 0, BUFSIZE);
+
     
     string sendingbuffer = "";
     for(int i=0; i < 5; ++i){
         sendingbuffer+= "time%";
         
     } 
+    string tmp = to_string(sizeof(sendingbuffer));
+    cout << to_string(sizeof(sendingbuffer)) << "length:" << sendingbuffer.length() <<endl;
+    strncpy(buffer,""+tmp, sendingbuffer.length());
+    cout << "sendpackage: " << buffer <<endl; 
+    send(socket_client, buffer, sizeof(length), 0);
+    memset(buffer, 0, BUFSIZE);
 
     
     const char *cstr = sendingbuffer.c_str();    
@@ -99,22 +101,6 @@ int main()
         }
     }while(result > 0);
     
-    
-    // 5 Anfragen einzelnt schicken
-    /*
-    for(int i=0; i < 5; ++i){
-        strcpy(buffer, "time");
-        time_t now = time(NULL);
-        string timeStamp = ctime(&now);      
-        replace(timeStamp.begin(), timeStamp.end(), '\n', ' '); 
-        
-        send(socket_client, buffer, BUFSIZE, 0);   
-        recv(socket_client, buffer, BUFSIZE, 0);
-   
-        cout << "[" << timeStamp.substr(11, 8) << "] Antwort " << (i+1) 
-             << ": " << buffer << endl; 
-    }
-    */
     close(socket_client);
     return 0;
 }
