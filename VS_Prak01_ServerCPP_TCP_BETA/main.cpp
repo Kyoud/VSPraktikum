@@ -25,7 +25,7 @@ using namespace std;
 
 std::mutex mtx;
 
-void talk(int socket_server, int socket_client, map<string, Konto> konten) {
+void talk(int socket_server, int socket_client, map<string, Konto*> konten) {
     char buffer[BUFSIZE];
     char sendbuffer[BUFSIZE];
     int result, sendbytes;
@@ -102,10 +102,10 @@ void talk(int socket_server, int socket_client, map<string, Konto> konten) {
                 if (zahlung)
                 {
                     mtx.lock();
-                    konten.at(kontonummer).changesaldo(stol(betrag));
+                    konten.at(kontonummer)->changesaldo(stol(betrag));
                     mtx.unlock();
                 }
-                page = konten.at(kontonummer).generatepage();
+                page = konten.at(kontonummer)->generatepage();
             }
         }
 
@@ -114,8 +114,8 @@ void talk(int socket_server, int socket_client, map<string, Konto> konten) {
         sendbytes = send(socket_server, sendbuffer, sizeof (sendbuffer), 0);
         if (sendbytes == -1)
             cout << "send failed";
-        //close(socket_client);
-
+        close(socket_server);
+        return;
 
 
         //return 0;
@@ -128,10 +128,10 @@ int main() {
 
 
     socklen_t size;
-    map<string, Konto> konten;
-    Konto k1 = Konto("123", 100);
-    Konto k2 = Konto("124", 100);
-    Konto k3 = Konto("125", 100);
+    map<string, Konto*> konten;
+    Konto* k1 = new Konto("123", 100);
+    Konto* k2 = new Konto("124", 100);
+    Konto* k3 = new Konto("125", 100);
     konten.insert(make_pair("123", k1));
     konten.insert(make_pair("124", k2));
     konten.insert(make_pair("125", k3));
@@ -169,5 +169,5 @@ int main() {
 
         std::thread first(talk, socket_server, socket_client, konten);
         first.detach();
-    }
+    }   
 }
